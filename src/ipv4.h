@@ -4,5 +4,10 @@
 // #include <unistd.h>
 // #include <arpa/inet.h>
 // #include <netdb.h>
+typedef struct{
+    char* ip;
+    int length;
+} i_pp;
 
-void get_ipv4();
+i_pp get_ipv4();
+

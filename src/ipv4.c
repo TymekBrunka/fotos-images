@@ -4,8 +4,9 @@
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+#include "ipv4.h"
 
-void get_ipv4() {
+i_pp get_ipv4() {
     char hostname[1024];
     struct addrinfo hints, *res, *p;
     int status;
@@ -22,8 +23,8 @@ void get_ipv4() {
     // Get address info
     if ((status = getaddrinfo(hostname, NULL, &hints, &res)) != 0) {
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-        // return 1;
-    } else {
+        return (i_pp){"", 0};
+    }
 
     // Loop through all the results and get the first valid IP address
     for (p = res; p != NULL; p = p->ai_next) {
@@ -34,6 +35,6 @@ void get_ipv4() {
     }
 
     freeaddrinfo(res); // Free the linked list
-    // return ipstr;
-    }
+    return (i_pp){ipstr, strlen(ipstr)};
+    // }
 }

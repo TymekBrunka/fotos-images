@@ -1,0 +1,122 @@
+@font-face {
+    font-family: Roboto Mono;
+    src: url(fonts/Roboto_Mono/static/RobotoMono-Regular.ttf);
+    font-weight: regular;
+}
+
+@font-face {
+    font-family: Roboto Mono;
+    src: url(fonts/Roboto_Mono/static/RobotoMono-Bold.ttf);
+    font-weight: bold;
+}
+
+* {
+    padding: 0;
+    margin: 0;
+}
+
+:root {
+    --bg: #2c2d30;
+    --bg1: #35373b;
+    --bg2: #3e4045;
+    --fg: #b1b4b9;
+    --green: #99bc80;
+    /* --blue: #41a7fc; */
+    --cyan: #34bfd0;
+    --purple: #c27fd7;
+
+    --me-fr: 1fr;
+    --you-fr: 1fr;
+}
+
+content {
+    display: grid;
+
+    grid-template-rows: auto 1fr;
+
+    width: 100%;
+    height: 100vh;
+    box-sizing: border-box;
+}
+
+body {
+    background-color: var(--bg);
+    color: var(--fg);
+    font-family: Roboto Mono;
+    font-size: 18px;
+    font-weight: 900;
+}
+
+barr,
+.barr {
+    display: block;
+
+    width: 100%;
+    /* background-color: var(--bg1); */
+    font-size: 22px;
+    padding: 5px;
+    text-align: center;
+    color: var(--bg);
+    box-shadow: 0px -1px 2px var(--bg);
+    box-sizing: border-box;
+    border: none;
+}
+
+content>barr {
+    font-size: 25px;
+    background-color: var(--green);
+}
+
+me>.barr {
+    background-color: var(--cyan);
+}
+
+you>.barr {
+    background-color: var(--purple);
+}
+
+holder {
+    display: grid;
+
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: 1fr;
+    gap: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+
+    /* background-color: var(--bg); */
+    /* width: 100%; */
+    /* height: 100%; */
+}
+
+me,
+you {
+    background-color: var(--bg2);
+    overflow-y: auto;
+    border-radius: 15px;
+}
+
+
+@media all and (orientation: portrait) {
+    holder {
+        grid-template-rows: var(--me-fr) var(--you-fr);
+        grid-template-columns: 1fr;
+    }
+
+
+    holder.hid-me {
+        --me-fr: auto;
+    }
+
+    holder.hid-you {
+        --you-fr: auto;
+    }
+
+    holder.hid-me me>files {
+        display: none;
+    }
+
+    holder.hid-you you>files {
+        display: none;
+    }
+}
