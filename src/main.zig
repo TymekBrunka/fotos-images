@@ -1,13 +1,6 @@
 const std = @import("std");
 const zap = @import("zap");
 const h = @import("handling.zig");
-
-extern "c" fn get_ipv4() i_pp;
-const i_pp = extern struct {
-    length: usize,
-    ip: [*:0]u8,
-};
-
 // const c = @cImport({@cInclude("src/piv4.h")});
 
 pub fn main() !void {
