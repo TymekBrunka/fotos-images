@@ -1,9 +1,11 @@
+// #include <cstdlib>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <unistd.h>
 #include <arpa/inet.h>
 #include <netdb.h>
+// #include <stdio.h>
 #include "ipv4.h"
 
 i_pp get_ipv4() {
@@ -23,7 +25,7 @@ i_pp get_ipv4() {
     // Get address info
     if ((status = getaddrinfo(hostname, NULL, &hints, &res)) != 0) {
         fprintf(stderr, "getaddrinfo error: %s\n", gai_strerror(status));
-        return (i_pp){"", 0};
+        return (i_pp){0, ""};
     }
 
     // Loop through all the results and get the first valid IP address
@@ -35,6 +37,10 @@ i_pp get_ipv4() {
     }
 
     freeaddrinfo(res); // Free the linked list
-    return (i_pp){ipstr, strlen(ipstr)};
+    char* g = (char*)malloc(strlen(ipstr));
+    for (int i = 0; i < strlen(ipstr); i++){
+        g[i] = ipstr[i];
+    }
+    return (i_pp){strlen(ipstr), g};
     // }
 }
