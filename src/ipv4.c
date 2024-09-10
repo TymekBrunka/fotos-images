@@ -32,7 +32,6 @@ i_pp get_ipv4() {
     for (p = res; p != NULL; p = p->ai_next) {
         struct sockaddr_in *ipv4 = (struct sockaddr_in *)p->ai_addr;
         inet_ntop(p->ai_family, &(ipv4->sin_addr), ipstr, sizeof ipstr);
-        printf("IPv4 address on LAN: %s\n", ipstr);
         break; // We only want the first one
     }
 

@@ -13,15 +13,15 @@ if &shortmess =~ 'A'
 else
   set shortmess=aoO
 endif
-badd +4 src/main.zig
-badd +45 src/handling.zig
-badd +1 ~/Documents/fotos-images/src/site/assets/style.css
-badd +9 ~/Documents/fotos-images/src/site/index.html
+badd +1 src/main.zig
+badd +33 src/handling.zig
+badd +48 ~/Documents/fotos-images/src/site/assets/style.css
+badd +11 ~/Documents/fotos-images/src/site/index.html
+badd +30 ~/Documents/fotos-images/src/qr_gen.zig
 argglobal
 %argdel
 edit src/main.zig
 argglobal
-balt src/handling.zig
 setlocal fdm=manual
 setlocal fde=0
 setlocal fmr={{{,}}}
@@ -32,12 +32,12 @@ setlocal fdn=20
 setlocal fen
 silent! normal! zE
 let &fdl = &fdl
-let s:l = 4 - ((3 * winheight(0) + 28) / 56)
+let s:l = 1 - ((0 * winheight(0) + 28) / 56)
 if s:l < 1 | let s:l = 1 | endif
 keepjumps exe s:l
 normal! zt
-keepjumps 4
-normal! 034|
+keepjumps 1
+normal! 026|
 tabnext 1
 if exists('s:wipebuf') && len(win_findbuf(s:wipebuf)) == 0 && getbufvar(s:wipebuf, '&buftype') isnot# 'terminal'
   silent exe 'bwipe ' . s:wipebuf

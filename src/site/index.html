@@ -5,9 +5,13 @@
 </head>
 
 <body>
+    <img id="qr" src="assets/img/qr.svg" alt="kod qr" style="display: none;">
     <content>
-        <barr>* strona na {s}</barr>
-        <!-- <img src="assets/img/qr.svg" width="300px" height="300px"> -->
+        <barr>
+            <button id="qr-btn"><img src="assets/img/qr.svg" alt="kod qr"></button>
+            <span style="margin-left: 10px;"></span>
+            strona na {s}
+        </barr>
         <holder>
             <me>
                 <button class="barr">Ty</button>
@@ -24,4 +28,5 @@
         </holder>
     </content>
     <script src="assets/js/toggle-visible.js"></script>
+    <script src="assets/js/toggle-qr.js"></script>
 </body>

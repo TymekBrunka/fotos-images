@@ -39,6 +39,17 @@ content {
     box-sizing: border-box;
 }
 
+content > barr > button {
+    height: 100%;
+    border: none;
+    outline: none;
+    border-radius: 0px;
+}
+
+content > barr > button > img {
+    height: 100%;
+}
+
 body {
     background-color: var(--bg);
     color: var(--fg);
@@ -63,8 +74,13 @@ barr,
 }
 
 content>barr {
+    display: flex;
+
     font-size: 25px;
+    text-align: left;
     background-color: var(--green);
+    grid-template-columns: 1fr auto;
+    padding: 5px 10px;
 }
 
 me>.barr {
@@ -119,4 +135,13 @@ you {
     holder.hid-you you>files {
         display: none;
     }
+}
+
+#qr {
+    display: block;
+    position: fixed;
+    width: min(50vw, 50vh);
+    height: min(50vw, 50vh);
+    top: calc(50vh - min(25vw, 25vh));
+    left: calc(50vw - min(25vw, 25vh));
 }

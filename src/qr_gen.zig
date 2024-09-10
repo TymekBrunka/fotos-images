@@ -26,5 +26,7 @@ pub fn gen(msg: []const u8, alloc: std.mem.Allocator) ![]u8 {
         }
     }
     try writer.print("</svg>", .{});
-    return al.toOwnedSlice();
+    const slice = al.toOwnedSlice();
+    al.deinit();
+    return slice;
 }
