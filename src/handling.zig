@@ -45,17 +45,6 @@ pub fn handleStaticFile(_: *httpz.Request, res: *httpz.Response, comptime filePa
 }
 
 pub fn index(_: *httpz.Request, res: *httpz.Response) !void {
-    // var gpa: std.heap.GeneralPurposeAllocator(.{}) = .{};
-    // defer _ = gpa.deinit();
-    // const alloc = gpa.allocator();
-
-    // if (r.path) |the_path| {
-    //     std.debug.print("PATH: {s}\n", .{the_path});
-    //     std.debug.print("BODY: {any}\n", .{r.body});
-    // }
-    // if (r.query) |the_query| {
-    //     std.debug.print("QUERY: {s}\n", .{the_query});
-    // }
     const ipv4: c.i_pp = @bitCast(c.get_ipv4());
     const ip = std.mem.span(ipv4.ip);
     try std.fmt.format(res.writer(), @embedFile("site/index.html"), .{ip});
@@ -70,7 +59,4 @@ pub fn qr_code(_: *httpz.Request, res: *httpz.Response) anyerror!void {
     const ipv4: c.i_pp = @bitCast(c.get_ipv4());
     const ip = std.mem.span(ipv4.ip);
     try qr_gen.respond_with_qr(res, ip, alloc);
-    // const qr = qr_gen.gen(ip, alloc) catch "";
-    // res.body = qr;
-    // alloc.free(qr);
 }
