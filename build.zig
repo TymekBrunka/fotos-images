@@ -15,6 +15,22 @@ pub fn build(b: *std.Build) void {
     // set a preferred release mode, allowing the user to decide how to optimize.
     const optimize = b.standardOptimizeOption(.{});
 
+    const wasm = b.addExecutable(.{
+        .name = "site",
+        .root_source_file = b.path("src/site/assets/wasm/wasm.zig"),
+        .target = b.resolveTargetQuery(.{ .cpu_arch = .wasm32, .os_tag = .freestanding }),
+        .optimize = .ReleaseSmall,
+    });
+    // wasm.global_base = 6560;
+    wasm.entry = .disabled;
+    wasm.rdynamic = true;
+    wasm.import_memory = true;
+    wasm.stack_size = std.wasm.page_size;
+
+    wasm.initial_memory = std.wasm.page_size;
+    wasm.max_memory = std.wasm.page_size;
+    b.installArtifact(wasm);
+
     const exe = b.addExecutable(.{
         .name = "fotos-images",
         .root_source_file = b.path("src/main.zig"),
@@ -22,15 +38,16 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    const zap = b.dependency("zap", .{
+    const httpz = b.dependency("httpz", .{
         .target = target,
         .optimize = optimize,
-        .openssl = false, // set to true to enable TLS support
     });
 
-    exe.root_module.addImport("zap", zap.module("zap"));
     exe.addCSourceFile(.{ .file = b.path("src/ipv4.c") });
+    exe.linkLibC();
     exe.root_module.addIncludePath(b.path("src"));
+    // the executable from your call to b.addExecutable(...)
+    exe.root_module.addImport("httpz", httpz.module("httpz"));
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
