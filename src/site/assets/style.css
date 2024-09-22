@@ -39,14 +39,14 @@ content {
     box-sizing: border-box;
 }
 
-content > barr > button {
+content>barr>button {
     height: 100%;
     border: none;
     outline: none;
     border-radius: 0px;
 }
 
-content > barr > button > img {
+content>barr>button>img {
     height: 100%;
 }
 
@@ -107,8 +107,10 @@ holder {
 
 me,
 you {
+    display: grid;
+    grid-template-rows: auto 1fr;
+
     background-color: var(--bg2);
-    overflow-y: auto;
     border-radius: 15px;
 }
 
@@ -125,10 +127,14 @@ files {
     display: grid;
 
     /* grid-template-columns: repeat(8, 1fr); */
-    grid-template-columns: repeat(8, minmax(auto, 1fr));
+    /* grid-template-columns: repeat(8, minmax(auto, 1fr)); */
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+    /* grid-template-rows: repeat(auto-fill, 10px); */
     padding: 10px;
     gap: 10px;
     box-sizing: border-box;
+    overflow-y: auto;
+    max-height: 100%;
 }
 
 #add {
@@ -136,12 +142,14 @@ files {
 }
 
 .card {
+    width: 100%;
     background-color: var(--bg);
     border: 2px solid var(--fg);
     outline: none;
     color: var(--fg);
     font-family: Roboto Mono;
     font-weight: 900;
+    overflow-wrap: anywhere;
     /* margin: auto 0; */
 }
 
@@ -160,15 +168,16 @@ files {
         --you-fr: auto;
     }
 
-    holder.hid-me me>files {
+    holder.hid-me me files {
         display: none;
     }
 
-    holder.hid-you you>files {
+    holder.hid-you you files {
         display: none;
     }
 
     files {
-        grid-template-columns: repeat(4, minmax(auto, 1fr));
+        /* grid-template-columns: repeat(4, minmax(auto, 1fr)); */
+        grid-template-columns: 1fr 1fr 1fr 1fr;
     }
 }

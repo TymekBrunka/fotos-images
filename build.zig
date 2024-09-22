@@ -25,10 +25,11 @@ pub fn build(b: *std.Build) void {
     wasm.entry = .disabled;
     wasm.rdynamic = true;
     wasm.import_memory = true;
+    wasm.export_memory = true;
     wasm.stack_size = std.wasm.page_size;
 
-    wasm.initial_memory = std.wasm.page_size;
-    wasm.max_memory = std.wasm.page_size;
+    wasm.initial_memory = std.wasm.page_size * 2;
+    wasm.max_memory = std.wasm.page_size * 2;
     b.installArtifact(wasm);
 
     const exe = b.addExecutable(.{

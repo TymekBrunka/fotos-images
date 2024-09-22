@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   width="20mm"
+   height="20mm"
+   viewBox="0 0 20 20"
+   version="1.1"
+   id="svg1"
+   inkscape:version="1.3 (0e150ed6c4, 2023-07-21)"
+   sodipodi:docname="plus.svg"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#67471c"
+     bordercolor="#000000"
+     borderopacity="0.25"
+     inkscape:showpageshadow="2"
+     inkscape:pageopacity="0.0"
+     inkscape:pagecheckerboard="0"
+     inkscape:deskcolor="#d1d1d1"
+     inkscape:document-units="mm"
+     showgrid="true"
+     inkscape:zoom="5.2667228"
+     inkscape:cx="1.9936496"
+     inkscape:cy="55.917126"
+     inkscape:window-width="1920"
+     inkscape:window-height="974"
+     inkscape:window-x="-11"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1">
+    <inkscape:grid
+       id="grid1"
+       units="mm"
+       originx="0"
+       originy="0"
+       spacingx="0.99999997"
+       spacingy="0.99999997"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="4"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true"
+       enabled="true" />
+    <inkscape:grid
+       id="grid3"
+       units="mm"
+       originx="0"
+       originy="0"
+       spacingx="0.24999999"
+       spacingy="0.24999999"
+       empcolor="#e500e4"
+       empopacity="0.30196078"
+       color="#e5bf00"
+       opacity="0.14901961"
+       empspacing="4"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true"
+       enabled="false" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <g
+     inkscape:label="Warstwa 1"
+     inkscape:groupmode="layer"
+     id="layer1">
+    <path
+       id="rect2"
+       style="fill:#ffffff;fill-opacity:1;stroke:#f1f1f1;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
+       d="m 9.9999997,2.9999999 c -0.6154283,0.015615 -1.0103679,0.2795616 -0.9999999,1 l 1.223e-4,5.0001222 -5.0001222,-1.223e-4 c -0.6049655,0.019248 -1.0115399,0.2678938 -1,0.9999999 0.00413,0.6519883 0.3184588,1.0037173 1,1.0000003 l 5.0001222,0 -1.223e-4,4.999999 c -0.010948,0.725757 0.3893705,0.982739 0.9999999,1 0.6755253,0.0023 0.9975583,-0.342123 1.0000003,-1 L 11,11 l 4.999999,0 c 0.723215,0.01068 0.983528,-0.387083 1,-1.0000003 0.0034,-0.6799891 -0.346499,-0.9963075 -1,-0.9999999 L 11,9.0001221 11,3.9999999 c -6.3e-4,-0.6643684 -0.331031,-1.0006198 -1.0000003,-1 z"
+       sodipodi:nodetypes="ccccccccccccccccc" />
+  </g>
+</svg>
