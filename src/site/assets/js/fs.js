@@ -30,6 +30,8 @@ async function sendFiles(files) {
     const resolvedFiles = await Promise.all(newFiles);
 
     for (fil of resolvedFiles) {
+        console.log("sending: ")
+        console.log(`${nr}\\${fil}`)
         fetch("/sendfiles",
 
             {
@@ -42,7 +44,4 @@ async function sendFiles(files) {
             },
         );
     }
-
-    console.log("sending: ")
-    console.log(`${nr};${resolvedFiles.join("\\")}`)
 }

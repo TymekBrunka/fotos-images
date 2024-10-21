@@ -36,6 +36,9 @@ function main() {
             if (json.event == "give_id"){
                 iam = json.id
             }
+            if (json.event == "ask_me"){
+                sock.send("EVENT_load_file:"+json.id)
+            }
         }
     }
 
