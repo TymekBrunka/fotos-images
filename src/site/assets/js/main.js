@@ -20,9 +20,8 @@ function main() {
     fs_menu = document.createElement("input")
     fs_menu.type = "file"
     fs_menu.multiple = true
-    iam = -1;
 
-    nr = 0
+    nr = -1
     sock = new WebSocket(`ws://${location.host}/ws`)
 
     sock.onopen = () => {
@@ -33,11 +32,20 @@ function main() {
         let json = ""
         try { json = JSON.parse(msg.data) } catch (err) { console.log(`{err}`); }
         if (json != "") {
-            if (json.event == "give_id"){
-                iam = json.id
+            if (json.event == "give_id") {
+                nr = json.id
             }
-            if (json.event == "ask_me"){
-                sock.send("EVENT_load_file:"+json.id)
+            if (json.event == "ask_me") {
+                fetch("/loadfile",
+                    {
+                        method: 'POST',
+                        body: `${nr}\\${json.id}`,
+                        // responseType: 'text', // Explicitly set the responseType to 'text'
+                        headers: {
+                            'Content-Type': 'text/plain'
+                        },
+                    },
+                );
             }
         }
     }

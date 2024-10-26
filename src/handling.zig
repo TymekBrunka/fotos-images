@@ -115,40 +115,36 @@ fn split(str: ?[]const u8, split_char: u8, alloc: std.mem.Allocator) !?[]const [
     return null;
 }
 
-// fn splitFirst(str: ?[]const u8, split_char: u8, alloc: std.mem.Allocator) !?[]const []u8 {
-//     if (str != null) {
-//         var al = std.ArrayList(u8).init(alloc);
-//         var string_list = std.ArrayList([]const u8).init(alloc);
-//         defer al.deinit();
-//         const stri = str.?;
-//         for (stri) |char| {
-//             if (char == split_char) {
-//                 const string = try al.toOwnedSlice();
-//                 try string_list.append(string);
-//                 al.clearAndFree();
-//                 al.clearRetainingCapacity();
-//                 al.append(split_char);
-//                 const string2 = try al.toOwnedSlice();
-//                 try string_list.append(string2);
-//                 al.clearAndFree();
-//                 al.clearRetainingCapacity();
-//                 try string_list.append(str[string.len + 1 ..]);
-//                 return try string_list.toOwnedSlice();
-//             } else {
-//                 try al.append(char);
-//             }
-//         }
-//
-//         const string = try al.toOwnedSlice();
-//         try string_list.append(string);
-//         try string_list.append("");
-//         try string_list.append("");
-//         al.clearAndFree();
-//         al.clearRetainingCapacity();
-//         return try string_list.toOwnedSlice();
-//     }
-//     return null;
-// }
+fn splitFirst(str: []const u8, split_char: u8, alloc: std.mem.Allocator) ![][]const u8 {
+    var al = std.ArrayList(u8).init(alloc);
+    var string_list = std.ArrayList([]const u8).init(alloc);
+    defer al.deinit();
+    for (str) |char| {
+        if (char == split_char) {
+            const string = try al.toOwnedSlice();
+            try string_list.append(string);
+            al.clearAndFree();
+            al.clearRetainingCapacity();
+            try al.append(split_char);
+            const string2 = try al.toOwnedSlice();
+            try string_list.append(string2);
+            al.clearAndFree();
+            al.clearRetainingCapacity();
+            // try string_list.append(str.?[string.len + 1 ..]);
+            // return try string_list.toOwnedSlice();
+        } else {
+            try al.append(char);
+        }
+    }
+
+    const string = try al.toOwnedSlice();
+    try string_list.append(string);
+    // try string_list.append("");
+    // try string_list.append(str.?[string.len + 1 ..]);
+    al.clearAndFree();
+    al.clearRetainingCapacity();
+    return try string_list.toOwnedSlice();
+}
 
 fn bigFree(T: type, thing: []const []const T, alloc: std.mem.Allocator) void {
     for (thing) |b| {
@@ -158,7 +154,7 @@ fn bigFree(T: type, thing: []const []const T, alloc: std.mem.Allocator) void {
 }
 
 pub fn sendFiles(state: *State, req: *httpz.Request, res: *httpz.Response) anyerror!void {
-    std.debug.print("body: {?s}\n", .{req.body()});
+    // std.debug.print("body: {?s}\n", .{req.body()});
     // for (req.headers.keys, 0..) |key, i| {
     //     if (std.mem.eql(u8, key, "data")) {}
     // }
@@ -178,7 +174,7 @@ pub fn sendFiles(state: *State, req: *httpz.Request, res: *httpz.Response) anyer
         const fid = p[2];
         const ft = p[4];
         const name = p[6];
-        // std.debug.print("\n\np: {s}, {s}, {s}, {s}, {s}, {s}, {s}, {s}, {s}\n", .{ p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7], p[8] });
+        // std.debug.print("\n\np: {s}, {s}, {s}, {s}, {s}, {s}, {s}, {s}\n", .{ p[0], p[1], p[2], p[3], p[4], p[5], p[6], p[7] });
         //
         // const empty = try al.toOwnedSlice();
         // const ft_split = ft_splitt orelse empty;
@@ -200,15 +196,52 @@ pub fn sendFiles(state: *State, req: *httpz.Request, res: *httpz.Response) anyer
         const file = try dir.createFile(filename, .{});
 
         const bytes_written = try file.writeAll(decoded_buffer);
-        std.debug.print("written {} bytes for file {s}\n", .{ bytes_written, filename });
+        std.debug.print("written {} bytes for file {s} for user nr {s}\n", .{ bytes_written, filename, nr });
         defer file.close();
 
         const rez = try std.fmt.allocPrint(alloc, "{{ \"event\" : \"ask_me\", \"id\" : \"{s}\" }}", .{fid});
-        const usize_nr = try std.fmt.parseInt(usize, nr, 1);
+        const usize_nr = try std.fmt.parseInt(usize, nr, 2);
         state.mutex.lock();
         try state.conn[usize_nr].?.write(rez);
+        // std.debug.print("written for user {d}\n", .{usize_nr});
         state.mutex.unlock();
         alloc.free(rez);
     }
     res.body = "hi";
+}
+
+pub fn actualySendThem(_: *State, req: *httpz.Request, res: *httpz.Response) anyerror!void {
+    var gpa: std.heap.GeneralPurposeAllocator(.{}) = .{};
+    defer _ = gpa.deinit();
+    const alloc = gpa.allocator();
+    if (req.body() != null) {
+        const req_split = try split(req.body().?, '\\', alloc);
+        const rs = req_split.?;
+        defer bigFree(u8, rs, alloc);
+        const nr = req_split.?[0];
+        const fid = req_split.?[2];
+        // const fid = try std.fmt.allocPrint(alloc, "{s};", .{_fid});
+        std.debug.print("nr: {s}, file id: {s}\n", .{ nr, fid });
+        var iter_dir = try std.fs.cwd().openDir(nr, .{ .iterate = true });
+        var dir_iter = iter_dir.iterate();
+        var found = false;
+        while (try dir_iter.next()) |entry| {
+            std.debug.print("{s}\n", .{entry.name});
+            const entry_fid = try splitFirst(entry.name, ';', alloc);
+            // bigFree(u8, entry_fid, alloc);
+            std.debug.print("enry fid: {s}\n", .{entry_fid});
+            if ((entry.kind == std.fs.File.Kind.file) and (std.mem.eql(u8, fid, entry_fid[0]))) {
+                std.debug.print("GYAT found enry fid: {s}\n", .{entry_fid});
+                bigFree(u8, entry_fid, alloc);
+                found = true;
+                break;
+            } else {
+                bigFree(u8, entry_fid, alloc);
+            }
+        }
+        iter_dir.close();
+        if (!found) {
+            res.body = "";
+        }
+    }
 }

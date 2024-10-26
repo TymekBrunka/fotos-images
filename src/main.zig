@@ -37,6 +37,7 @@ pub fn main() !void {
     router.get("/assets/img/qr.svg", h.qr_code);
     router.get("/ws", ws.ws);
     router.post("/sendfiles", h.sendFiles);
+    router.post("/loadfile", h.actualySendThem);
     server.notFound(h.Handler.notFound);
     server.errorHandler(h.Handler.uncaughtError);
     staticFiles.gen(router);
