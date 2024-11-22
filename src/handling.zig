@@ -4,6 +4,8 @@ const qr_gen = @import("qr_gen.zig");
 const buildin = @import("builtin");
 const sd = @import("shared_data.zig");
 const State = sd.State;
+const sf = @import("staticFiles.zig");
+const su = @import("strUtils.zig");
 
 const Encoder = std.base64.standard.Encoder;
 const Decoder = std.base64.standard.Decoder;
@@ -84,75 +86,6 @@ pub fn qr_code(_: *State, _: *httpz.Request, res: *httpz.Response) anyerror!void
     try qr_gen.respond_with_qr(res, ip, alloc);
 }
 
-fn split(str: ?[]const u8, split_char: u8, alloc: std.mem.Allocator) !?[]const []u8 {
-    if (str != null) {
-        var string_list = std.ArrayList([]u8).init(alloc);
-        var al = std.ArrayList(u8).init(alloc);
-        defer al.deinit();
-        const stri = str.?;
-        for (stri) |char| {
-            if (char == split_char) {
-                try string_list.append(try al.toOwnedSlice());
-                al.clearAndFree();
-                al.clearRetainingCapacity();
-                try al.append(split_char);
-                try string_list.append(try al.toOwnedSlice());
-                al.clearAndFree();
-                al.clearRetainingCapacity();
-            } else {
-                try al.append(char);
-            }
-        }
-
-        if (al.items.len > 0) {
-            try string_list.append(try al.toOwnedSlice());
-            al.clearAndFree();
-            al.clearRetainingCapacity();
-        }
-
-        return try string_list.toOwnedSlice();
-    }
-    return null;
-}
-
-fn splitFirst(str: []const u8, split_char: u8, alloc: std.mem.Allocator) ![][]const u8 {
-    var al = std.ArrayList(u8).init(alloc);
-    var string_list = std.ArrayList([]const u8).init(alloc);
-    defer al.deinit();
-    for (str) |char| {
-        if (char == split_char) {
-            const string = try al.toOwnedSlice();
-            try string_list.append(string);
-            al.clearAndFree();
-            al.clearRetainingCapacity();
-            try al.append(split_char);
-            const string2 = try al.toOwnedSlice();
-            try string_list.append(string2);
-            al.clearAndFree();
-            al.clearRetainingCapacity();
-            // try string_list.append(str.?[string.len + 1 ..]);
-            // return try string_list.toOwnedSlice();
-        } else {
-            try al.append(char);
-        }
-    }
-
-    const string = try al.toOwnedSlice();
-    try string_list.append(string);
-    // try string_list.append("");
-    // try string_list.append(str.?[string.len + 1 ..]);
-    al.clearAndFree();
-    al.clearRetainingCapacity();
-    return try string_list.toOwnedSlice();
-}
-
-fn bigFree(T: type, thing: []const []const T, alloc: std.mem.Allocator) void {
-    for (thing) |b| {
-        alloc.free(b);
-    }
-    alloc.free(thing);
-}
-
 pub fn sendFiles(state: *State, req: *httpz.Request, res: *httpz.Response) anyerror!void {
     // std.debug.print("body: {?s}\n", .{req.body()});
     // for (req.headers.keys, 0..) |key, i| {
@@ -165,11 +98,11 @@ pub fn sendFiles(state: *State, req: *httpz.Request, res: *httpz.Response) anyer
         defer _ = gpa.deinit();
         const alloc = gpa.allocator();
 
-        const pp = try split(data, '\\', alloc);
+        const pp = try su.split(data, '\\', alloc);
         // std.debug.print("cwd: {}", .{std.fs.cwd()});
 
         const p = pp.?;
-        defer bigFree(u8, p, alloc);
+        defer su.bigFree(u8, p, alloc);
         const nr = p[0];
         const fid = p[2];
         const ft = p[4];
@@ -200,9 +133,11 @@ pub fn sendFiles(state: *State, req: *httpz.Request, res: *httpz.Response) anyer
         defer file.close();
 
         const rez = try std.fmt.allocPrint(alloc, "{{ \"event\" : \"ask_me\", \"id\" : \"{s}\" }}", .{fid});
-        const usize_nr = try std.fmt.parseInt(usize, nr, 2);
+        const other_num = if (nr[0] == '1') "0" else if (nr[0] == '0') "1" else "2";
+        const usize_nr = try std.fmt.parseInt(usize, other_num, 10);
         state.mutex.lock();
-        try state.conn[usize_nr].?.write(rez);
+        if (state.conn[usize_nr] != null)
+            try state.conn[usize_nr].?.write(rez);
         // std.debug.print("written for user {d}\n", .{usize_nr});
         state.mutex.unlock();
         alloc.free(rez);
@@ -215,10 +150,11 @@ pub fn actualySendThem(_: *State, req: *httpz.Request, res: *httpz.Response) any
     defer _ = gpa.deinit();
     const alloc = gpa.allocator();
     if (req.body() != null) {
-        const req_split = try split(req.body().?, '\\', alloc);
+        const req_split = try su.split(req.body().?, '\\', alloc);
         const rs = req_split.?;
-        defer bigFree(u8, rs, alloc);
-        const nr = req_split.?[0];
+        defer su.bigFree(u8, rs, alloc);
+        const self_nr = req_split.?[0];
+        const nr = if (self_nr[0] == '1') "0" else if (self_nr[0] == '0') "1" else "2";
         const fid = req_split.?[2];
         // const fid = try std.fmt.allocPrint(alloc, "{s};", .{_fid});
         std.debug.print("nr: {s}, file id: {s}\n", .{ nr, fid });
@@ -226,17 +162,38 @@ pub fn actualySendThem(_: *State, req: *httpz.Request, res: *httpz.Response) any
         var dir_iter = iter_dir.iterate();
         var found = false;
         while (try dir_iter.next()) |entry| {
-            std.debug.print("{s}\n", .{entry.name});
-            const entry_fid = try splitFirst(entry.name, ';', alloc);
-            // bigFree(u8, entry_fid, alloc);
-            std.debug.print("enry fid: {s}\n", .{entry_fid});
+            // std.debug.print("{s}\n", .{entry.name});
+            const entry_fid = try su.splitFirst(entry.name, ';', alloc);
+            // su.bigFree(u8, entry_fid, alloc);
+            // std.debug.print("enry fid: {s}\n", .{entry_fid});
             if ((entry.kind == std.fs.File.Kind.file) and (std.mem.eql(u8, fid, entry_fid[0]))) {
-                std.debug.print("GYAT found enry fid: {s}\n", .{entry_fid});
-                bigFree(u8, entry_fid, alloc);
+                const path = try std.fmt.allocPrint(alloc, "{s}/{s}", .{ nr, entry.name });
+                defer alloc.free(path);
+                std.debug.print("found enry path: {s}\n", .{path});
+
+                const raw = try sf.read_file_to_string(path, alloc);
+                defer alloc.free(raw);
+
+                // std.debug.print("raw: {s}", .{raw});
+
+                const encoded_length = Encoder.calcSize(raw.len);
+                const encoded_buffer = try alloc.alloc(u8, encoded_length);
+                defer alloc.free(encoded_buffer);
+                _ = Encoder.encode(encoded_buffer, raw);
+
+                const entry_split = try su.split(entry.name, ';', alloc);
+                const ft = entry_split.?[2];
+                const name = entry_split.?[4];
+                _ = std.mem.replace(u8, ft, "&", "/", ft);
+                // std.debug.print("ft: {s}", .{ft});
+                defer su.bigFree(u8, entry_split.?, alloc);
+                try std.fmt.format(res.writer(), "{s}\\{s}\\{s}\\{s}\\data:{s};base64,{s}", .{ nr, fid, ft, name, ft, encoded_buffer });
+
+                su.bigFree(u8, entry_fid, alloc);
                 found = true;
                 break;
             } else {
-                bigFree(u8, entry_fid, alloc);
+                su.bigFree(u8, entry_fid, alloc);
             }
         }
         iter_dir.close();
